@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace KlientTCP
 {
@@ -48,33 +49,41 @@ namespace KlientTCP
 
             while (flag_2)
             {
-                Console.WriteLine("Podaj wiadomośc do wysłania:");
-                string sendData = Console.ReadLine();
-
-                if (networkStream.CanWrite)
+                try
                 {
-                    Byte[] sendBytes = Encoding.UTF8.GetBytes(sendData);
-                    tcpClient.ReceiveBufferSize = sendBytes.Length;
-                    networkStream.Write(sendBytes, 0, sendBytes.Length);
-                    Console.WriteLine("wysano do serwera" + sendData);
+                    Console.WriteLine("Podaj wiadomośc do wysłania:");
+                    string sendData = Console.ReadLine();
+
+                    if (networkStream.CanWrite)
+                    {
+                        Byte[] sendBytes = Encoding.UTF8.GetBytes(sendData);
+                        tcpClient.ReceiveBufferSize = sendBytes.Length;
+                        networkStream.Write(sendBytes, 0, sendBytes.Length);
+                        Console.WriteLine("wysano do serwera" + sendData);
+                    }
+                    if (networkStream.CanRead)
+                    {
+                        byte[] bytes = new byte[(int)tcpClient.ReceiveBufferSize];
+
+                        networkStream.Read(bytes, 0, (int)tcpClient.ReceiveBufferSize);
+
+                        string returnData = Encoding.UTF8.GetString(bytes);
+                        Console.WriteLine("odebrano od serwera" + returnData);
+                    }
+
+                    Console.WriteLine("Jeśli chcesz znowu coś nadac wciśnij klawisz Y. W przeciwnym wypadku wciśnij dowolny klawisz");
+                    string condition = Console.ReadLine();
+                    if (condition.ToLower() != "y")
+                    {
+                        flag_2 = false;
+                    }
                 }
-                if (networkStream.CanRead)
+                catch (Exception)
                 {
-                    byte[] bytes = new byte[(int)tcpClient.ReceiveBufferSize];
-
-                    networkStream.Read(bytes, 0, (int)tcpClient.ReceiveBufferSize);
-
-                    string returnData = Encoding.UTF8.GetString(bytes);
-                    Console.WriteLine("odebrano od serwera" + returnData);
-                }
-
-                Console.WriteLine("Jeśli chcesz znowu coś nadac wciśnij klawisz Y. W przeciwnym wypadku wciśnij dowolny klawisz");
-                string condition = Console.ReadLine();
-                if (condition.ToLower() != "y")
-                {
+                    Console.WriteLine("Serwer nieodpowiada. Kończe aplikacje");
+                    Thread.Sleep(3000);
                     flag_2 = false;
                 }
-
             }
             networkStream.Close();
             tcpClient.Close();
