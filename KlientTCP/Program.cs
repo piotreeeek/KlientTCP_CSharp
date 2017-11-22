@@ -59,7 +59,7 @@ namespace KlientTCP
                         Byte[] sendBytes = Encoding.UTF8.GetBytes(sendData);
                         tcpClient.ReceiveBufferSize = sendBytes.Length;
                         networkStream.Write(sendBytes, 0, sendBytes.Length);
-                        Console.WriteLine("wysano do serwera" + sendData);
+                        Console.WriteLine("wysano do serwera: " + sendData);
                     }
                     if (networkStream.CanRead)
                     {
@@ -68,7 +68,7 @@ namespace KlientTCP
                         networkStream.Read(bytes, 0, (int)tcpClient.ReceiveBufferSize);
 
                         string returnData = Encoding.UTF8.GetString(bytes);
-                        Console.WriteLine("odebrano od serwera" + returnData);
+                        Console.WriteLine("odebrano od serwera: " + returnData);
                     }
 
                     Console.WriteLine("Jeśli chcesz znowu coś nadac wciśnij klawisz Y. W przeciwnym wypadku wciśnij dowolny klawisz");
